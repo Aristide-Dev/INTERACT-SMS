@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace InteractSms\InteractSms;
 
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
-use InteractSms\InteractSms\Console\Commands\InteractSmsCommand;
+use InteractSms\InteractSms\Http\Client;
 
 class InteractSmsServiceProvider extends ServiceProvider
 {
@@ -16,7 +18,25 @@ class InteractSmsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/interact-sms.php', 'interact-sms');
 
-        $this->app->singleton(InteractSms::class);
+        $this->app->singleton(Client::class, function (Application $app): Client {
+            $config = $app->make(Repository::class);
+
+            return new Client(
+                baseUrl: rtrim((string) $config->get('interact-sms.base_url'), '/'),
+                authUrl: (string) $config->get('interact-sms.auth_url'),
+                healthUrl: (string) $config->get('interact-sms.health_url'),
+                username: (string) $config->get('interact-sms.username', ''),
+                password: (string) $config->get('interact-sms.password', ''),
+                clientId: (string) $config->get('interact-sms.client_id', 'ismstoken'),
+                timeout: (int) $config->get('interact-sms.timeout', 20),
+                senderName: (string) $config->get('interact-sms.sender_name', ''),
+                clientSecret: (string) $config->get('interact-sms.client_secret', ''),
+            );
+        });
+
+        $this->app->singleton(InteractSms::class, function (Application $app): InteractSms {
+            return new InteractSms($app->make(Client::class));
+        });
     }
 
     /**
@@ -24,12 +44,6 @@ class InteractSmsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->loadRoutesFrom(__DIR__.'/../routes/interact-sms.php');
-
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'interact-sms');
-
-        $this->loadTranslationsFrom(__DIR__.'/../lang', 'interact-sms');
-
         if (! $this->app->runningInConsole()) {
             return;
         }
@@ -37,25 +51,5 @@ class InteractSmsServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/interact-sms.php' => config_path('interact-sms.php'),
         ], ['interact-sms', 'interact-sms-config']);
-
-        $this->publishes([
-            __DIR__.'/../resources/views' => resource_path('views/vendor/interact-sms'),
-        ], ['interact-sms', 'interact-sms-views']);
-
-        $this->publishes([
-            __DIR__.'/../lang' => $this->app->langPath('vendor/interact-sms'),
-        ], ['interact-sms', 'interact-sms-lang']);
-
-        $this->publishes([
-            __DIR__.'/../public' => public_path('vendor/interact-sms'),
-        ], ['interact-sms', 'interact-sms-assets']);
-
-        $this->publishesMigrations([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
-        ], ['interact-sms', 'interact-sms-migrations']);
-
-        $this->commands([
-            InteractSmsCommand::class,
-        ]);
     }
 }

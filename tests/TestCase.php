@@ -15,4 +15,13 @@ abstract class TestCase extends Orchestra
             InteractSmsServiceProvider::class,
         ];
     }
+
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set('interact-sms.username', 'user');
+        $app['config']->set('interact-sms.password', 'secret');
+        $app['config']->set('interact-sms.sender_name', 'Phonovation');
+        $app['config']->set('interact-sms.client_secret', 'client-secret');
+        $app['config']->set('interact-sms.timeout', 20);
+    }
 }

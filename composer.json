@@ -1,13 +1,15 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "aristide/interact-sms",
-    "description": "",
+    "description": "Client Laravel pour l'API Interact SMS (Phonovation) : campagnes SMS, sender IDs et webhooks.",
     "keywords": [
         "laravel",
         "aristide",
-        "interact-sms"
+        "interact-sms",
+        "sms",
+        "phonovation"
     ],
-    "homepage": "https://github.com/aristide/interact-sms",
+    "homepage": "https://github.com/Aristide-Dev/INTERACT-SMS",
     "license": "MIT",
     "authors": [
         {
@@ -18,6 +20,7 @@
     ],
     "require": {
         "php": "^8.3",
+        "illuminate/http": "^12.0||^13.0",
         "illuminate/support": "^12.0||^13.0"
     },
     "require-dev": {
@@ -86,6 +89,10 @@
         "clear": [
             "@php vendor/bin/testbench package:purge-skeleton --ansi"
         ]
+    },
+    "support": {
+        "issues": "https://github.com/Aristide-Dev/INTERACT-SMS/issues",
+        "source": "https://github.com/Aristide-Dev/INTERACT-SMS"
     },
     "extra": {
         "laravel": {
