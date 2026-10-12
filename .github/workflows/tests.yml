@@ -3,9 +3,11 @@ name: tests
 on:
   push:
     branches:
+      - master
       - main
       - '*.x'
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
@@ -23,13 +25,24 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         php: [8.3, 8.4, 8.5]
-        laravel: [12.*, 13.*]
+        laravel: [10.*, 11.*, 12.*, 13.*]
         stability: [prefer-lowest, prefer-stable]
         include:
+          - laravel: 10.*
+            testbench: 8.*
+          - laravel: 11.*
+            testbench: 9.*
           - laravel: 12.*
             testbench: 10.*
           - laravel: 13.*
             testbench: 11.*
+        exclude:
+          - laravel: 10.*
+            php: 8.4
+          - laravel: 10.*
+            php: 8.5
+          - laravel: 11.*
+            php: 8.5
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -46,9 +59,19 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Constrain Laravel and Testbench
+        run: composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --dev --no-interaction --no-update
+
+      - name: Require Pest arch plugin
+        if: matrix.laravel == '10.*'
+        run: composer require "pestphp/pest-plugin-arch:>=2.7 <3.0.0" --dev --no-interaction --no-update
+
       - name: Install dependencies
+        env:
+          # Laravel 10 and 11 still have Packagist advisories. Composer 2.9 uses audit.block-insecure; 2.10+ uses the env var.
+          COMPOSER_POLICY_ADVISORIES_BLOCK: "0"
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer config audit.block-insecure false
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --no-scripts
           composer run prepare
 
@@ -59,13 +82,8 @@ jobs:
         run: composer lint:check
 
       - name: Type Coverage
-        if: runner.os != 'Windows'
+        if: runner.os != 'Windows' && matrix.laravel != '10.*'
         run: composer test:types
 
       - name: Test Suite
-        if: runner.os != 'Windows'
         run: composer test:unit
-
-      - name: Test Suite (Windows)
-        if: runner.os == 'Windows'
-        run: vendor/bin/pest

@@ -17,7 +17,7 @@
 ## Prérequis
 
 - PHP 8.3+
-- Laravel 12 ou 13
+- Laravel 10.48, 11, 12 ou 13
 - Un compte [Interact SMS / Phonovation](https://secure.interactsms.com/Register.aspx) (nom d'utilisateur et mot de passe API)
 
 ## Installation

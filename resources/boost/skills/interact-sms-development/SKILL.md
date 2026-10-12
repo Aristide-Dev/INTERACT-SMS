@@ -20,7 +20,7 @@ Use this skill when a Laravel application needs to send SMS campaigns or parse I
 
 ### 1. Inspect the Laravel app context
 
-- confirm the app is a Laravel 12 or 13 project
+- confirm the app is a Laravel 10.48, 11, 12, or 13 project
 - check whether `INTERACT_SMS_USERNAME`, `INTERACT_SMS_PASSWORD`, and `INTERACT_SMS_SENDER_NAME` are already set
 - prefer the facade `InteractSms\InteractSms\Facades\InteractSms` at call sites
 
