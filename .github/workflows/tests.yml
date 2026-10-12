@@ -70,6 +70,10 @@ jobs:
         if: matrix.laravel == '10.*'
         run: composer require "larastan/larastan:>=2.11.2 <3.0.0" --dev --no-interaction --no-update
 
+      - name: Require Guzzle 7 for Laravel 10
+        if: matrix.laravel == '10.*'
+        run: composer require "guzzlehttp/guzzle:>=7.8.2 <8.0.0" --no-interaction --no-update
+
       - name: Require Larastan for Laravel 11+
         if: matrix.laravel != '10.*'
         run: composer require "larastan/larastan:>=3.9 <4.0.0" --dev --no-interaction --no-update
