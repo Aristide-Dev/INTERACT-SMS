@@ -66,6 +66,14 @@ jobs:
         if: matrix.laravel == '10.*'
         run: composer require "pestphp/pest-plugin-arch:>=2.7 <3.0.0" --dev --no-interaction --no-update
 
+      - name: Require Larastan for Laravel 10
+        if: matrix.laravel == '10.*'
+        run: composer require "larastan/larastan:>=2.11.2 <3.0.0" --dev --no-interaction --no-update
+
+      - name: Require Larastan for Laravel 11+
+        if: matrix.laravel != '10.*'
+        run: composer require "larastan/larastan:>=3.9 <4.0.0" --dev --no-interaction --no-update
+
       - name: Install dependencies
         env:
           # Laravel 10 and 11 still have Packagist advisories. Composer 2.9 uses audit.block-insecure; 2.10+ uses the env var.
